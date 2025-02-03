@@ -14,38 +14,38 @@ namespace NexusStore.API.Jobs
     private readonly ILogger<TransactionJob> _logger = logger;
 
     [DisableConcurrentExecution(timeoutInSeconds: 300)]
-    public bool ProcessTransaction()
+    public async Task<bool> ProcessTransaction()
     {
-      using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
+      using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
       try
       {
-        var entity = _context.Users.FirstOrDefault(u => u.Id == 1);
+        var entity = await _context.Users.FirstOrDefaultAsync(u => u.Id == 1);
 
         if (entity != null)
         {
 
           // Simulate delay to mimic row being changed before updating
-          Task.Delay(30000).Wait();
+          await Task.Delay(30000);
 
           entity.Username = "new_username6";
-          _context.SaveChanges();
+          await _context.SaveChangesAsync();
 
-          transaction.Commit();
-          return true; // Indicate success
         }
 
-        var product = _context.Products
+        var product = await _context.Products
            .Where(p => p.Id == 1)
-           .FirstOrDefault();
+           .FirstOrDefaultAsync();
 
         if (product != null)
         {
           product.Price = 100;
-          _context.SaveChanges();
+          await _context.SaveChangesAsync();
         }
 
-        return false; // Entity not found
+        await transaction.CommitAsync();
+        return true;
+
       }
       catch (DbUpdateConcurrencyException ex)
       {
