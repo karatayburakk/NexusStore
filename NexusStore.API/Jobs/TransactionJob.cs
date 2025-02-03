@@ -1,8 +1,11 @@
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using NexusStore.API.Data;
 
+// Version check off all tables before updating
+// Transaction Roolback: Transaction fail because product does not exists, so transaction will be rolled back
+// DisableConcurrentExecution attribute added to avoid concurrency conflicts
 namespace NexusStore.API.Jobs
 {
   public class TransactionJob(NexusDbContext context, ILogger<TransactionJob> logger)
@@ -10,7 +13,7 @@ namespace NexusStore.API.Jobs
     private readonly NexusDbContext _context = context;
     private readonly ILogger<TransactionJob> _logger = logger;
 
-    // [DisableConcurrentExecution(timeoutInSeconds: 300)]
+    [DisableConcurrentExecution(timeoutInSeconds: 300)]
     public bool ProcessTransaction()
     {
       using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
@@ -31,19 +34,30 @@ namespace NexusStore.API.Jobs
           transaction.Commit();
           return true; // Indicate success
         }
+
+        var product = _context.Products
+           .Where(p => p.Id == 1)
+           .FirstOrDefault();
+
+        if (product != null)
+        {
+          product.Price = 100;
+          _context.SaveChanges();
+        }
+
         return false; // Entity not found
       }
       catch (DbUpdateConcurrencyException ex)
       {
         _logger.LogWarning(ex, "Concurrency conflict occurred.");
         transaction.Rollback();
-        return false; // Indicate failure
+        throw; // Rethrow the exception to mark the job as failed
       }
       catch (Exception ex)
       {
         _logger.LogError(ex, "An error occurred during ProcessTransaction.");
         transaction.Rollback();
-        return false; // Indicate failure
+        throw; // Rethrow the exception to mark the job as failed
       }
     }
   }
