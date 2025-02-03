@@ -17,16 +17,15 @@ namespace NexusStore.API.Jobs
 
       try
       {
-        var entity = _context.Users.FirstOrDefault(u => u.Id == 21);
+        var entity = _context.Users.FirstOrDefault(u => u.Id == 1);
 
         if (entity != null)
         {
-          _context.Entry(entity).Property("RowVersion").OriginalValue = entity.RowVersion;
 
           // Simulate delay to mimic row being changed before updating
           Task.Delay(30000).Wait();
 
-          entity.Username = "new_username5";
+          entity.Username = "new_username6";
           _context.SaveChanges();
 
           transaction.Commit();

@@ -33,12 +33,6 @@ namespace NexusStore.API.Repositories
             // Attach the user entity to the context
             _context.Users.Attach(user);
 
-            // Mark the entity as modified
-            _context.Entry(user).State = EntityState.Modified;
-
-            // Explicitly mark RowVersion as modified to ensure concurrency check
-            _context.Entry(user).Property(u => u.RowVersion).IsModified = true;
-
             // Save changes to the database
             await _context.SaveChangesAsync();
 

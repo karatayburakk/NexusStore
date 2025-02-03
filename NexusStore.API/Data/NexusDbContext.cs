@@ -15,18 +15,35 @@ namespace NexusStore.API.Data
             modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<Product>().ToTable("products");
             modelBuilder.Entity<Category>().ToTable("categories");
+
+            // Configure RowVersion for entities that implement IAuditableEntity.
         }
 
         public override int SaveChanges()
         {
+            SetModifiedStateForUpdatedEntities();
             UpdateAuditFields();
             return base.SaveChanges();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            SetModifiedStateForUpdatedEntities();
             UpdateAuditFields();
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void SetModifiedStateForUpdatedEntities()
+        {
+            // Get entries that are being updated.
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity is IAuditableEntity && e.State == EntityState.Detached);
+
+            foreach (var entry in entries)
+            {
+                // Set the state to Modified.
+                entry.State = EntityState.Modified;
+            }
         }
 
         private void UpdateAuditFields()

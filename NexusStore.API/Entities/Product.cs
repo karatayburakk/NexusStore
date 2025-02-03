@@ -14,8 +14,5 @@ namespace NexusStore.API.Entities
     public DateTime UpdatedAt { get; set; }
     public string? Description { get; set; }
 
-    [Timestamp]
-    public required byte[] RowVersion { get; set; } // Add RowVersion property
-
   }
 }

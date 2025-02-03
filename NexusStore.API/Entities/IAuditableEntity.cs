@@ -7,8 +7,5 @@ namespace NexusStore.API.Entities
     public int Id { get; set; }
     DateTime CreatedAt { get; set; }
     DateTime UpdatedAt { get; set; }
-
-    [Timestamp]
-    public byte[] RowVersion { get; set; }
   }
 }
