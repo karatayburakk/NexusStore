@@ -8,12 +8,10 @@ namespace NexusStore.API.Mappings
   {
     public UserProfile()
     {
-      CreateMap<User, CreateUserDto>();
       CreateMap<CreateUserDto, User>();
       CreateMap<User, UserResponseDto>();
-      CreateMap<UserResponseDto, User>();
       CreateMap<UpdateUserDto, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
+      CreateMap<RegisterDto, User>();
     }
   }
 }

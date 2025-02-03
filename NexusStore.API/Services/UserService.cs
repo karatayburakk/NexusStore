@@ -2,7 +2,6 @@ using NexusStore.API.Entities;
 using NexusStore.API.Repositories;
 using AutoMapper;
 using NexusStore.API.Dtos;
-using Newtonsoft.Json;
 
 namespace NexusStore.API.Services
 {
@@ -26,6 +25,7 @@ namespace NexusStore.API.Services
         public async Task<UserResponseDto> CreateUserAsync(CreateUserDto createUserDto)
         {
             var user = _mapper.Map<User>(createUserDto);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
             var createdUser = await _userRepository.CreateUserAsync(user);
             return _mapper.Map<UserResponseDto>(createdUser);
         }

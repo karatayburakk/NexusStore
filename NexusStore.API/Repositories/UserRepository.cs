@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using NexusStore.API.Data;
-using NexusStore.API.Dtos;
 using NexusStore.API.Entities;
 
 namespace NexusStore.API.Repositories
@@ -18,7 +17,10 @@ namespace NexusStore.API.Repositories
         {
             return await _context.Users.FindAsync(id);
         }
-
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
         public async Task<User> CreateUserAsync(User user)
         {
             _context.Users.Add(user);
@@ -33,6 +35,9 @@ namespace NexusStore.API.Repositories
 
             // Mark the entity as modified
             _context.Entry(user).State = EntityState.Modified;
+
+            // Explicitly mark RowVersion as modified to ensure concurrency check
+            _context.Entry(user).Property(u => u.RowVersion).IsModified = true;
 
             // Save changes to the database
             await _context.SaveChangesAsync();

@@ -1,7 +1,9 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace NexusStore.API.Entities
 {
-  public class Product
+  public class Product : IAuditableEntity
   {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -11,5 +13,9 @@ namespace NexusStore.API.Entities
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string? Description { get; set; }
+
+    [Timestamp]
+    public required byte[] RowVersion { get; set; } // Add RowVersion property
+
   }
 }

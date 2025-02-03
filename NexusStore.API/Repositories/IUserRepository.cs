@@ -10,5 +10,7 @@ namespace NexusStore.API.Repositories
         Task<User> CreateUserAsync(User user);
         Task<User?> UpdateUserAsync(User user);
         Task DeleteUserAsync(User user);
+
+        Task<User?> GetUserByEmailAsync(string email);
     }
 }

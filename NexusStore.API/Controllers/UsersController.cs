@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using NexusStore.API.Services;
 using NexusStore.API.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NexusStore.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class UsersController(IUserService userService) : ControllerBase
     {
@@ -18,6 +20,7 @@ namespace NexusStore.API.Controllers
         }
 
         [HttpGet("{id}")]
+
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
