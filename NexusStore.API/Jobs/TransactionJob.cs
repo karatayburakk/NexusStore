@@ -37,6 +37,12 @@ namespace NexusStore.API.Jobs
            .Where(p => p.Id == 1)
            .FirstOrDefaultAsync();
 
+
+        // This line will throw an exception because the product does not exist
+        // And rollback will be activated
+        // product.Price = 100;
+        // await _context.SaveChangesAsync();
+
         if (product != null)
         {
           product.Price = 100;

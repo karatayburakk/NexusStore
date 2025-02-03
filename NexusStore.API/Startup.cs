@@ -46,6 +46,8 @@ namespace NexusStore.API
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IAuthService, AuthService>();
       services.AddScoped<IEmailService, EmailService>();
+      services.AddScoped<ICategoryRepository, CategoryRepository>();
+      services.AddScoped<ICategoryService, CategoryService>();
 
       services.AddAutoMapper(typeof(UserProfile));
 

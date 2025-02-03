@@ -16,7 +16,7 @@ namespace NexusStore.API.Jobs
       RecurringJob.AddOrUpdate<TransactionJob>(
           "process-transaction",
           transactionJob => transactionJob.ProcessTransaction(),
-          "*/2 * * * *",
+          "0 9 * * *",
           new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
     }
   }
