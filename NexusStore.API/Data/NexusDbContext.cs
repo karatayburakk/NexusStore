@@ -42,6 +42,7 @@ namespace NexusStore.API.Data
             foreach (var entry in entries)
             {
                 // Set the state to Modified.
+                Console.WriteLine($"Setting state to Modified for entity {entry.Entity.GetType().Name}");
                 entry.State = EntityState.Modified;
             }
         }

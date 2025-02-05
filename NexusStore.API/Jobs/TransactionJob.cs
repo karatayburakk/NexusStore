@@ -21,12 +21,15 @@ namespace NexusStore.API.Jobs
       try
       {
         var entity = await _context.Users.FirstOrDefaultAsync(u => u.Id == 1);
+        _logger.LogInformation("Processing transaction for user {Username}", entity?.Username);
 
         if (entity != null)
         {
 
           // Simulate delay to mimic row being changed before updating
+          _logger.LogInformation("Simulating delay...");
           await Task.Delay(30000);
+          _logger.LogInformation("Delay complete.");
 
           entity.Username = "new_username6";
           await _context.SaveChangesAsync();
@@ -56,13 +59,13 @@ namespace NexusStore.API.Jobs
       catch (DbUpdateConcurrencyException ex)
       {
         _logger.LogWarning(ex, "Concurrency conflict occurred.");
-        transaction.Rollback();
+        await transaction.RollbackAsync();
         throw; // Rethrow the exception to mark the job as failed
       }
       catch (Exception ex)
       {
         _logger.LogError(ex, "An error occurred during ProcessTransaction.");
-        transaction.Rollback();
+        await transaction.RollbackAsync();
         throw; // Rethrow the exception to mark the job as failed
       }
     }

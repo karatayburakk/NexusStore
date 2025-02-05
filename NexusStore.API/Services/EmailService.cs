@@ -1,10 +1,9 @@
 namespace NexusStore.API.Services
 {
 
-  public class EmailService(IUserService userService, IConfiguration configuration) : IEmailService
+  public class EmailService(IUserService userService) : IEmailService
   {
     private readonly IUserService _userService = userService;
-    private readonly IConfiguration _configuration = configuration;
 
     public async Task SendDailyEmailAsync()
     {
