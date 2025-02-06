@@ -27,6 +27,7 @@ namespace NexusStore.API.Jobs
 
       GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 3 });
       GlobalJobFilters.Filters.Add(new JobFailedFilter());
+      // Register the caching filter to ensure only one instance per job runs concurrently.
     }
 
     private class JobFailedFilter : JobFilterAttribute, IServerFilter

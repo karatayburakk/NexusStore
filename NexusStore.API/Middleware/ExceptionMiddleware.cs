@@ -1,19 +1,15 @@
 using System.Net;
 using System.Text.Json;
+using System.Data.Common; // added for DbException
+// using Npgsql; // optionally if using Npgsql-specific exceptions
+using NexusStore.API.Utilities;
 
 namespace NexusStore.API.Middleware
 {
   public class ExceptionMiddleware(RequestDelegate next, IWebHostEnvironment env)
-  // ILogger<ExceptionMiddleware> logger,
   {
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-      PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-      WriteIndented = true
-    };
 
     private readonly RequestDelegate _next = next;
-    // private readonly ILogger<ExceptionMiddleware> _logger = logger;
     private readonly IWebHostEnvironment _env = env;
 
     public async Task InvokeAsync(HttpContext context)
@@ -24,7 +20,6 @@ namespace NexusStore.API.Middleware
       }
       catch (Exception ex)
       {
-        // _logger.LogError(ex, "An unhandled exception occurred during request processing");
         await HandleExceptionAsync(context, ex);
       }
     }
@@ -35,8 +30,14 @@ namespace NexusStore.API.Middleware
 
       context.Response.StatusCode = exception switch
       {
+        CacheException => (int)HttpStatusCode.ServiceUnavailable,
+        TimeoutException => (int)HttpStatusCode.GatewayTimeout,
+        DbException => (int)HttpStatusCode.ServiceUnavailable,
         KeyNotFoundException => (int)HttpStatusCode.NotFound,
         ArgumentException => (int)HttpStatusCode.BadRequest,
+        UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+        System.ComponentModel.DataAnnotations.ValidationException => (int)HttpStatusCode.BadRequest,
+        Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException => (int)HttpStatusCode.Conflict,
         _ => (int)HttpStatusCode.InternalServerError
       };
 
@@ -47,7 +48,7 @@ namespace NexusStore.API.Middleware
         Details = _env.IsDevelopment() ? exception.StackTrace ?? string.Empty : null
       };
 
-      var json = JsonSerializer.Serialize(errorDetails, SerializerOptions);
+      var json = JsonSerializer.Serialize(errorDetails, JsonOptions.Options);
       await context.Response.WriteAsync(json);
     }
   }
@@ -57,5 +58,11 @@ namespace NexusStore.API.Middleware
     public int StatusCode { get; set; }
     public string Message { get; set; } = string.Empty;
     public string? Details { get; set; }
+  }
+
+  public class CacheException : Exception
+  {
+    public CacheException(string message) : base(message) { }
+    public CacheException(string message, Exception innerException) : base(message, innerException) { }
   }
 }

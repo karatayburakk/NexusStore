@@ -8,13 +8,16 @@ namespace NexusStore.API.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<Product>().ToTable("products");
             modelBuilder.Entity<Category>().ToTable("categories");
+            modelBuilder.Entity<Country>().ToTable("countries");
 
             // Configure RowVersion for entities that implement IAuditableEntity.
         }
